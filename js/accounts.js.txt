@@ -1,0 +1,74 @@
+/**
+ * Accounts Module Logic
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    loadAccounts();
+
+    // Handle Form Submission
+    document.getElementById('accountForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const accountData = {
+            id: document.getElementById('accId').value || null,
+            name: document.getElementById('accName').value,
+            industry: document.getElementById('accIndustry').value,
+            website: document.getElementById('accWebsite').value
+        };
+
+        CRMStorage.saveRecord('accounts', accountData);
+        closeAccountModal();
+        loadAccounts();
+    });
+});
+
+function loadAccounts() {
+    const accounts = CRMStorage.getData('accounts');
+    renderAccountsTable(accounts);
+}
+
+function renderAccountsTable(accounts) {
+    const tableBody = document.getElementById('accountsTableBody');
+    if (!tableBody) return;
+
+    tableBody.innerHTML = accounts.map(acc => `
+        <tr class="hover:bg-gray-50 transition">
+            <td class="p-4 font-bold text-gray-800">${acc.name}</td>
+            <td class="p-4"><span class="bg-gray-100 px-2 py-1 rounded text-sm">${acc.industry}</span></td>
+            <td class="p-4 text-blue-500 underline"><a href="${acc.website}" target="_blank">${acc.website}</a></td>
+            <td class="p-4 text-right">
+                <button onclick="editAccount('${acc.id}')" class="text-blue-500 hover:text-blue-700 mx-2"><i class="fas fa-edit"></i></button>
+                <button onclick="deleteAccount('${acc.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Modal & Action Helpers
+window.openAccountModal = () => {
+    document.getElementById('accModalTitle').innerText = "Add Account";
+    document.getElementById('accountForm').reset();
+    document.getElementById('accId').value = "";
+    document.getElementById('accountModal').classList.remove('hidden');
+};
+
+window.closeAccountModal = () => document.getElementById('accountModal').classList.add('hidden');
+
+window.editAccount = (id) => {
+    const accounts = CRMStorage.getData('accounts');
+    const acc = accounts.find(a => a.id === id);
+    if (!acc) return;
+
+    document.getElementById('accModalTitle').innerText = "Edit Account";
+    document.getElementById('accId').value = acc.id;
+    document.getElementById('accName').value = acc.name;
+    document.getElementById('accIndustry').value = acc.industry;
+    document.getElementById('accWebsite').value = acc.website;
+    document.getElementById('accountModal').classList.remove('hidden');
+};
+
+window.deleteAccount = (id) => {
+    if (confirm('Delete this account? All associated contacts may lose their link.')) {
+        CRMStorage.deleteRecord('accounts', id);
+        loadAccounts();
+    }
+};

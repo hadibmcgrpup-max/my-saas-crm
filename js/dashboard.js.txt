@@ -1,0 +1,37 @@
+document.addEventListener('DOMContentLoaded', () => {
+    updateDashboardStats();
+    renderDashboardChart();
+});
+
+function updateDashboardStats() {
+    const stats = CRMStorage.getCounts();
+    
+    const statsContainer = document.getElementById('dashboard-stats');
+    if (!statsContainer) return;
+
+    const cards = [
+        { label: 'Total Leads', value: stats.leads, icon: 'fa-user-plus', color: 'text-blue-600' },
+        { label: 'Total Accounts', value: stats.accounts, icon: 'fa-building', color: 'text-green-600' },
+        { label: 'Opportunities', value: stats.opportunities, icon: 'fa-handshake', color: 'text-purple-600' },
+        { label: 'Total Revenue', value: `$${stats.revenue.toLocaleString()}`, icon: 'fa-dollar-sign', color: 'text-amber-600' }
+    ];
+
+    statsContainer.innerHTML = cards.map(card => `
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-medium uppercase">${card.label}</p>
+                    <h3 class="text-2xl font-bold mt-1">${card.value}</h3>
+                </div>
+                <div class="h-12 w-12 bg-gray-50 rounded-lg flex items-center justify-center ${card.color}">
+                    <i class="fas ${card.icon} text-xl"></i>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderDashboardChart() {
+    // We will use Chart.js for this. 
+    // Ensure <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> is in your HTML.
+}

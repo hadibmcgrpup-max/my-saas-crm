@@ -1,0 +1,60 @@
+/**
+ * CRM Storage Engine
+ * Handles all LocalStorage interactions
+ */
+const CRMStorage = {
+    // 1. GET ALL: Retrieve data for a specific module
+    getData: (moduleName) => {
+        const data = localStorage.getItem(`crm_${moduleName}`);
+        return data ? JSON.parse(data) : [];
+    },
+
+    // 2. SAVE: Overwrite the entire array for a module
+    saveData: (moduleName, data) => {
+        localStorage.setItem(`crm_${moduleName}`, JSON.stringify(data));
+    },
+
+    // 3. CREATE/UPDATE: Add or update a single record
+    saveRecord: (moduleName, record) => {
+        const data = CRMStorage.getData(moduleName);
+        
+        if (record.id) {
+            // Update existing
+            const index = data.findIndex(item => item.id === record.id);
+            if (index !== -1) {
+                data[index] = { ...data[index], ...record, updatedAt: new Date().toISOString() };
+            }
+        } else {
+            // Create new with unique ID and Timestamp
+            const newRecord = {
+                ...record,
+                id: Date.now().toString(), // Simple unique ID
+                createdAt: new Date().toISOString()
+            };
+            data.push(newRecord);
+        }
+        
+        CRMStorage.saveData(moduleName, data);
+        return data;
+    },
+
+    // 4. DELETE: Remove a record by ID
+    deleteRecord: (moduleName, id) => {
+        let data = CRMStorage.getData(moduleName);
+        data = data.filter(item => item.id !== id);
+        CRMStorage.saveData(moduleName, data);
+        return data;
+    },
+
+    // 5. STATS: Get counts for the Dashboard
+    getCounts: () => {
+        return {
+            leads: CRMStorage.getData('leads').length,
+            accounts: CRMStorage.getData('accounts').length,
+            opportunities: CRMStorage.getData('opportunities').length,
+            revenue: CRMStorage.getData('opportunities')
+                .filter(opt => opt.stage === 'Closed Won')
+                .reduce((sum, opt) => sum + parseFloat(opt.amount || 0), 0)
+        };
+    }
+};

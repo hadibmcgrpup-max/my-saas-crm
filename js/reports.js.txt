@@ -1,0 +1,69 @@
+document.addEventListener('DOMContentLoaded', () => {
+    initReports();
+});
+
+function initReports() {
+    const leads = CRMStorage.getData('leads');
+    const opportunities = CRMStorage.getData('opportunities');
+
+    // 1. Calculate Stats
+    calculateSummary(opportunities);
+
+    // 2. Lead Status Chart (Doughnut)
+    renderLeadsChart(leads);
+
+    // 3. Revenue Chart (Bar)
+    renderRevenueChart(opportunities);
+}
+
+function calculateSummary(opps) {
+    const totalRevenue = opps
+        .filter(o => o.stage === 'Closed Won')
+        .reduce((sum, o) => sum + parseFloat(o.amount || 0), 0);
+    
+    const winCount = opps.filter(o => o.stage === 'Closed Won').length;
+    const winRate = opps.length ? (winCount / opps.length * 100).toFixed(1) : 0;
+    const avgDeal = winCount ? (totalRevenue / winCount).toFixed(0) : 0;
+
+    document.getElementById('avgDealSize').innerText = `$${parseInt(avgDeal).toLocaleString()}`;
+    document.getElementById('winRate').innerText = `${winRate}%`;
+}
+
+function renderLeadsChart(leads) {
+    const statusCounts = leads.reduce((acc, lead) => {
+        acc[lead.status] = (acc[lead.status] || 0) + 1;
+        return acc;
+    }, {});
+
+    new Chart(document.getElementById('leadsChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(statusCounts),
+            datasets: [{
+                data: Object.values(statusCounts),
+                backgroundColor: ['#3b82f6', '#eab308', '#22c55e', '#a855f7', '#ef4444']
+            }]
+        },
+        options: { maintainAspectRatio: false }
+    });
+}
+
+function renderRevenueChart(opps) {
+    const stageRevenue = opps.reduce((acc, o) => {
+        acc[o.stage] = (acc[o.stage] || 0) + parseFloat(o.amount || 0);
+        return acc;
+    }, {});
+
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(stageRevenue),
+            datasets: [{
+                label: 'Potential Revenue',
+                data: Object.values(stageRevenue),
+                backgroundColor: '#6366f1'
+            }]
+        },
+        options: { maintainAspectRatio: false }
+    });
+}

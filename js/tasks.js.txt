@@ -1,0 +1,74 @@
+document.addEventListener('DOMContentLoaded', () => {
+    loadTasks();
+
+    document.getElementById('taskForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const taskData = {
+            id: document.getElementById('taskId').value || null,
+            desc: document.getElementById('taskDesc').value,
+            priority: document.getElementById('taskPriority').value,
+            date: document.getElementById('taskDate').value,
+            status: 'Pending'
+        };
+        CRMStorage.saveRecord('tasks', taskData);
+        closeTaskModal();
+        loadTasks();
+    });
+});
+
+function loadTasks() {
+    const tasks = CRMStorage.getData('tasks');
+    const grid = document.getElementById('tasksGrid');
+    if (!grid) return;
+
+    grid.innerHTML = tasks.map(task => `
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
+                <span class="text-xs font-bold uppercase px-2 py-1 rounded ${getPriorityColor(task.priority)}">
+                    ${task.priority}
+                </span>
+                <div class="flex gap-2">
+                    <button onclick="editTask('${task.id}')" class="text-gray-400 hover:text-blue-500"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteTask('${task.id}')" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <p class="text-gray-800 font-semibold mb-2">${task.desc}</p>
+            <div class="text-sm text-gray-500">
+                <i class="far fa-calendar-alt mr-1"></i> Due: ${task.date}
+            </div>
+        </div>
+    `).join('') || '<p class="text-gray-400 italic">No tasks assigned yet.</p>';
+}
+
+function getPriorityColor(p) {
+    if (p === 'High') return 'bg-red-100 text-red-700';
+    if (p === 'Medium') return 'bg-yellow-100 text-yellow-700';
+    return 'bg-green-100 text-green-700';
+}
+
+window.openTaskModal = () => {
+    document.getElementById('taskForm').reset();
+    document.getElementById('taskId').value = "";
+    document.getElementById('taskModal').classList.remove('hidden');
+};
+
+window.closeTaskModal = () => document.getElementById('taskModal').classList.add('hidden');
+
+window.editTask = (id) => {
+    const tasks = CRMStorage.getData('tasks');
+    const t = tasks.find(item => item.id === id);
+    if (!t) return;
+
+    window.openTaskModal();
+    document.getElementById('taskId').value = t.id;
+    document.getElementById('taskDesc').value = t.desc;
+    document.getElementById('taskPriority').value = t.priority;
+    document.getElementById('taskDate').value = t.date;
+};
+
+window.deleteTask = (id) => {
+    if (confirm('Delete this task?')) {
+        CRMStorage.deleteRecord('tasks', id);
+        loadTasks();
+    }
+};

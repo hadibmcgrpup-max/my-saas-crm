@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS CRM - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="flex items-center justify-center h-16 bg-slate-800 border-b border-slate-700">
+                <span class="text-2xl font-bold tracking-wider text-blue-400">SALES<span class="text-white">PRO</span></span>
+            </div>
+            
+            <nav class="mt-5 px-4 space-y-2">
+                <a href="index.html" class="nav-item flex items-center p-3 rounded-lg bg-blue-600 text-white">
+                    <i class="fas fa-th-large w-6"></i> <span>Dashboard</span>
+                </a>
+                <a href="leads.html" class="nav-item flex items-center p-3 rounded-lg text-gray-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fas fa-user-plus w-6"></i> <span>Leads</span>
+                </a>
+                <a href="accounts.html" class="nav-item flex items-center p-3 rounded-lg text-gray-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fas fa-building w-6"></i> <span>Accounts</span>
+                </a>
+                <a href="contacts.html" class="nav-item flex items-center p-3 rounded-lg text-gray-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fas fa-address-book w-6"></i> <span>Contacts</span>
+                </a>
+                <a href="opportunities.html" class="nav-item flex items-center p-3 rounded-lg text-gray-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fas fa-handshake w-6"></i> <span>Opportunities</span>
+                </a>
+                <a href="tasks.html" class="nav-item flex items-center p-3 rounded-lg text-gray-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fas fa-tasks w-6"></i> <span>Tasks</span>
+                </a>
+                <a href="reports.html" class="nav-item flex items-center p-3 rounded-lg text-gray-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fas fa-chart-line w-6"></i> <span>Reports</span>
+                </a>
+            </nav>
+        </aside>
+
+        <div class="flex-1 flex flex-col lg:ml-64">
+            
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm">
+                <button id="menuBtn" class="lg:hidden text-gray-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="relative w-96 hidden md:block">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" placeholder="Search records..." class="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50">
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-500 hover:text-blue-600"><i class="fas fa-bell"></i></button>
+                    <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">JS</div>
+                </div>
+            </header>
+
+           <main class="flex-1 overflow-y-auto p-8" id="main-content">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-800">Tasks & Activities</h2>
+        <button onclick="openTaskModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+            <i class="fas fa-plus mr-2"></i> New Task
+        </button>
+    </div>
+
+    <div id="tasksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+</main>
+
+<div id="taskModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+        <h3 class="text-xl font-bold mb-4">Task Details</h3>
+        <form id="taskForm" class="space-y-4">
+            <input type="hidden" id="taskId">
+            <div>
+                <label class="block text-sm font-medium">Task Description</label>
+                <input type="text" id="taskDesc" required class="w-full border p-2 rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Priority</label>
+                <select id="taskPriority" class="w-full border p-2 rounded-lg">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Due Date</label>
+                <input type="date" id="taskDate" required class="w-full border p-2 rounded-lg">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeTaskModal()" class="px-4 py-2 border rounded-lg">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Save Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/dashboard.js"></script>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
